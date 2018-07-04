@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tic Tac Toe</title>
+
+  <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="../assets/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div id="game" class="row">
+      <div id="alexa" class="col center">
+        <img src="../assets/alexa.png" width="40%">
+        <div class="O score">&nbsp;&nbsp;</div>
+      </div>
+      <div class="col-6 center">
+        <div id="board" class="center"></div>
+        <div id="win" class="center"></div>
+      </div>
+      <div id="google-home" class="col center">
+        <div class="X score">&nbsp;&nbsp;</div>
+        <img src="../assets/google.png" width="40%">
+      </div>
+    </div>
+
+    <script src="../assets/velocity.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
