@@ -114,7 +114,7 @@ svg .path {
 
 #winner-screen .win-symbols svg {
   height: 8rem;
-  position: absolute;
+  position: fixed;
   width: 8rem;
 }
 
@@ -135,6 +135,7 @@ svg .path {
   display: inline-block;
   line-height: 1.5;
   vertical-align: middle;
+  max-width: 100%;
 }
 
 #winner-screen .win-player .label {
@@ -207,8 +208,19 @@ svg .path {
   padding-left: 15px;
 }
 
+.winner-section {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 4
+}
+
 .congrats-container {
   position: relative;
+}
+
+.full-width {
+  width: 100%;
 }
 
 .congrats-container__label {

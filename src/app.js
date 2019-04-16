@@ -173,7 +173,7 @@ const config = {
     DevPubNubApi,
     PubNubApi,
   },
-  useApi: 'PubNubApi',
+  useApi: 'ApiDev',
   videos: {
     X: [
       '../assets/google-wins/1.mp4',
@@ -233,11 +233,11 @@ class WinnerScreenRenderer {
 
   render(winner, coords) {
     this.element.innerHTML = `
-      <div id="winner-screen" class="center anim-hide" role="button" style="color: rgb(84, 84, 84); opacity: 0; z-index: 4; line-height: 230px; visibility: inherit; position: fixed;">
+      <div id="winner-screen" class="center anim-hide" role="button" style="color: rgb(84, 84, 84); opacity: 0; line-height: 230px; visibility: inherit;">
         <div class="win-symbols  ${winner}" style="opacity: 0;">
           ${this.renderWinnerSymbols(winner, coords)}
         </div>
-        <div class="win-player" style="opacity: 0;">${this.renderWinner(winner)}</div>
+        <div class="win-player full-width" style="opacity: 0;">${this.renderWinner(winner)}</div>
       </div>
       `;
   }
@@ -262,6 +262,7 @@ class WinnerScreenRenderer {
   }
 
   renderWinner(winner) {
+    winner = 'O'
     const videoUrl = this.getRandomVideo(winner);
     switch (winner) {
       case 'X':
@@ -282,7 +283,7 @@ class WinnerScreenRenderer {
   renderVideo(title, videoUrl) {
     return `
       <div class="congrats-container">
-        <video autoplay loop muted src="${videoUrl}"></video>      
+        <video autoplay loop muted src="${videoUrl}" class="full-width"></video>      
         <div class="label congrats-container__label" style="opacity: 0;">${title}</div>
       </div>
     `;
@@ -305,7 +306,7 @@ class App {
       scores: new StoreScores(),
     };
 
-    this.winnerScreenRenderer = new WinnerScreenRenderer(this.$win);
+    this.winnerScreen = new WinnerScreenRenderer(this.$win);
     this.api = new config.apisClasses[config.useApi](config.pubNubKeys);
 
     $('#alexa').ondblclick = () => {
@@ -477,7 +478,7 @@ class App {
       return { left, top };
     });
 
-    this.winnerScreenRenderer.render(player, coords);
+    this.winnerScreen.render(player, coords);
   }
 
   async showWinner({ player = 'XO', path = [], direction = '' }) {
@@ -550,14 +551,15 @@ class App {
 
       $winSymbols.style.opacity = 1;
 
-      $crossOut.setAttribute('x1', crossOutCoords.x1);
+      const winnerScreenOffsetLeft = $win.getBoundingClientRect().left;
+      $crossOut.setAttribute('x1', crossOutCoords.x1 - winnerScreenOffsetLeft);
       $crossOut.setAttribute('y1', crossOutCoords.y1);
-      $crossOut.setAttribute('x2', crossOutCoords.x1);
+      $crossOut.setAttribute('x2', crossOutCoords.x1 - winnerScreenOffsetLeft);
       $crossOut.setAttribute('y2', crossOutCoords.y1);
 
       $crossOut.velocity(
         {
-          x2: crossOutCoords.x2,
+          x2: crossOutCoords.x2 - winnerScreenOffsetLeft,
           y2: crossOutCoords.y2,
         },
         {
@@ -638,7 +640,7 @@ class App {
   async finish() {
     this.state.finish = true;
     await this.showWinner(this.state.winner);
-    this.newGame();
+    // this.newGame();
   }
 }
 
