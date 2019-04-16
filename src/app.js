@@ -173,7 +173,30 @@ const config = {
     DevPubNubApi,
     PubNubApi,
   },
-  useApi: 'ApiDev',
+  useApi: 'PubNubApi',
+  videos: {
+    X: [
+      '../assets/google-wins/1.mp4',
+      '../assets/google-wins/2.mp4',
+      '../assets/google-wins/3.mp4',
+      '../assets/google-wins/4.mp4',
+      '../assets/google-wins/5.mp4',
+    ],
+    O: [
+      '../assets/alexa-wins/1.mp4',
+      '../assets/alexa-wins/2.mp4',
+      '../assets/alexa-wins/3.mp4',
+      '../assets/alexa-wins/4.mp4',
+      '../assets/alexa-wins/5.mp4',
+      '../assets/alexa-wins/6.mp4',
+    ],
+    XO: [
+      '../assets/draw/1.mp4',
+      '../assets/draw/2.mp4',
+      '../assets/draw/3.mp4',
+      '../assets/draw/4.mp4',
+    ],
+  },
 };
 
 class StoreScores {
@@ -219,17 +242,6 @@ class WinnerScreenRenderer {
       `;
   }
 
-  renderWinner(winner) {
-    switch (winner) {
-      case 'X':
-        return this.renderXWinnerScreen();
-      case 'O':
-        return this.renderOWinnerScreen();
-      default:
-        return this.renderDrawScreen();
-    }
-  }
-
   renderWinnerSymbols(winner, coords) {
     const xWinnerSymbol = '<path class="path" d="M16,16L112,112"></path><path class="path" d="M112,16L16,112"></path>';
     const oWinnerSymbol = '<path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>';
@@ -249,28 +261,33 @@ class WinnerScreenRenderer {
     ${symbols}`;
   }
 
-  renderXWinnerScreen() {
+  renderWinner(winner) {
+    const videoUrl = this.getRandomVideo(winner);
+    switch (winner) {
+      case 'X':
+        return this.renderVideo('GOOGLE HOME WINNER!', videoUrl);
+      case 'O':
+        return this.renderVideo('ALEXA WINNER!', videoUrl);
+      default:
+        return this.renderVideo('DRAW!', videoUrl);
+    }
+  }
+
+  getRandomVideo(winner) {
+    const videos = config.videos[winner];
+    const randomArrayIndex = Math.floor(Math.random() * videos.length);
+    return videos[randomArrayIndex];
+  }
+
+  renderVideo(title, videoUrl) {
     return `
       <div class="congrats-container">
-        <video autoplay loop src="../assets/google-wins/2.mp4"></video>      
-        <div class="label congrats-container__label" style="opacity: 0;">WINNER!</div>
+        <video autoplay loop muted src="${videoUrl}"></video>      
+        <div class="label congrats-container__label" style="opacity: 0;">${title}</div>
       </div>
     `;
   }
-
-  renderOWinnerScreen() {
-    return `
-      <div class="label" style="opacity: 0;">WINNER!</div>
-    `;
-  }
-
-  renderDrawScreen() {
-    return `
-      <div class="label" style="opacity: 0;">DRAW!</div>
-    `;
-  }
 }
-
 
 class App {
   constructor() {
@@ -621,7 +638,7 @@ class App {
   async finish() {
     this.state.finish = true;
     await this.showWinner(this.state.winner);
-    // this.newGame();
+    this.newGame();
   }
 }
 
