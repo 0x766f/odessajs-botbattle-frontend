@@ -262,7 +262,6 @@ class WinnerScreenRenderer {
   }
 
   renderWinner(winner) {
-    winner = 'O'
     const videoUrl = this.getRandomVideo(winner);
     switch (winner) {
       case 'X':
