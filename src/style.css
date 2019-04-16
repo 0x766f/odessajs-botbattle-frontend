@@ -142,7 +142,6 @@ svg .path {
   transition: height 0.4s linear, opacity 0.5s cubic-bezier(1, 0, 0.8, 0);
   -webkit-transition: height 0.4s linear, opacity 0.5s cubic-bezier(1, 0, 0.8, 0);
   overflow: hidden;
-  color: #88a0cd;
 }
 
 #winner-screen .win-player svg {
@@ -206,4 +205,16 @@ svg .path {
   min-height: 1px;
   padding-right: 15px;
   padding-left: 15px;
+}
+
+.congrats-container {
+  position: relative;
+}
+
+.congrats-container__label {
+  position: absolute;
+  bottom: 10%;
+  left: 0;
+  right: 0;
+  color: white;
 }

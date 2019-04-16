@@ -159,7 +159,7 @@ const config = {
     width: 20,
     delayBeforeShow: 500,
     durationDraw: 100,
-    delayBeforeCollapse: 500,
+    delayBeforeCollapse: 1000,
     durationCollapse: 250,
   },
   delayBeforeUpdateScores: 500,
@@ -173,7 +173,7 @@ const config = {
     DevPubNubApi,
     PubNubApi,
   },
-  useApi: 'PubNubApi',
+  useApi: 'ApiDev',
 };
 
 class StoreScores {
@@ -206,16 +206,6 @@ class StoreScores {
 class WinnerScreenRenderer {
   constructor(element) {
     this.element = element;
-
-    this.symbolsBig = {
-      X: `<svg class="X" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M16,16L112,112"></path>
-            <path class="path" d="M112,16L16,112"></path>
-          </svg>`,
-      O: `<svg class="O" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>
-          </svg>`,
-    };
   }
 
   render(winner, coords) {
@@ -261,22 +251,21 @@ class WinnerScreenRenderer {
 
   renderXWinnerScreen() {
     return `
-      ${this.symbolsBig.X}
-      <div class="label" style="opacity: 0;">WINNER!</div>
+      <div class="congrats-container">
+        <video autoplay loop src="../assets/google-wins/2.mp4"></video>      
+        <div class="label congrats-container__label" style="opacity: 0;">WINNER!</div>
+      </div>
     `;
   }
 
   renderOWinnerScreen() {
     return `
-      ${this.symbolsBig.O}
       <div class="label" style="opacity: 0;">WINNER!</div>
     `;
   }
 
   renderDrawScreen() {
     return `
-      ${this.symbolsBig.X}
-      ${this.symbolsBig.O}
       <div class="label" style="opacity: 0;">DRAW!</div>
     `;
   }
@@ -481,7 +470,6 @@ class App {
 
     const $win = $(`#winner-screen`);
     const $winPlayer = $('.win-player', this.$win);
-    const $winPlayerSvg = $$('.win-player svg', this.$win);
     const $winLabel = $('.label', this.$win);
 
     $win.style.opacity = 1;
@@ -496,8 +484,6 @@ class App {
       const firstAnimRect = $firstAnimSymbol.getBoundingClientRect();
       const lastAnimRect = $lastAnimSymbol.getBoundingClientRect();
       const animSymbolHalfWidth = firstAnimRect.width / 2;
-      const { left, top } = $winPlayerSvg[0].getBoundingClientRect();
-      const moveTo = { left, top };
 
       let crossOutCoords = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
@@ -570,43 +556,12 @@ class App {
 
       await delay(config.crossOut.delayBeforeCollapse);
 
-      await Promise.all([
-        $animSymbols.map(
-          el =>
-            new Promise(resolve => {
-              el.velocity(moveTo, {
-                duration: config.crossOut.durationCollapse,
-              }).then(() => resolve());
-            }),
-        ),
-        new Promise(resolve => {
-          $crossOut
-            .velocity(
-              {
-                x1: moveTo.left + animSymbolHalfWidth,
-                y1: moveTo.top + animSymbolHalfWidth,
-                x2: moveTo.left + animSymbolHalfWidth,
-                y2: moveTo.top + animSymbolHalfWidth,
-              },
-              {
-                duration: config.crossOut.durationCollapse,
-              },
-            )
-            .then(() => resolve());
-        }),
-      ]);
-
       $winSymbols.style.opacity = 0;
     }
 
     $winPlayer.style.opacity = 1;
 
     this.hideBoard();
-
-    $winPlayerSvg.forEach($el => {
-      $el.style.width = '26rem';
-      $el.style.height = '26rem';
-    });
 
     $winLabel.style.opacity = 1;
 
@@ -666,8 +621,10 @@ class App {
   async finish() {
     this.state.finish = true;
     await this.showWinner(this.state.winner);
-    this.newGame();
+    // this.newGame();
   }
 }
 
-window.app = new App();
+window.onload = () => {
+  window.app = new App();
+}
