@@ -219,6 +219,7 @@ class App {
       scores: new StoreScores(),
     };
 
+    this.winnerScreenRenderer = new WinnerScreenRenderer(this.$win);
     this.api = new config.apisClasses[config.useApi](config.pubNubKeys);
 
     $('#alexa').ondblclick = () => {
@@ -390,46 +391,7 @@ class App {
       return { left, top };
     });
 
-    const symbolsBig = {
-      X: `<svg class="X" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M16,16L112,112"></path>
-            <path class="path" d="M112,16L16,112"></path>
-          </svg>`,
-      O: `<svg class="O" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>
-          </svg>`,
-    };
-
-    const symbolBig = player === 'XO' ? `${symbolsBig.X}${symbolsBig.O}` : symbolsBig[player];
-
-    const win = `
-      <div id="winner-screen" class="center anim-hide" role="button" style="color: rgb(84, 84, 84); opacity: 0; z-index: 4; line-height: 230px; visibility: inherit; position: fixed;">
-        <div class="win-symbols  ${player}" style="opacity: 0;">
-          <svg class="symbol">
-            <line class="cross-out player-${player} path" />
-          </svg>
-          ${coords
-            .map(
-              ({ left, top }) => `
-              <svg class="${player} win-symbol" viewBox="0 0 128 128" style="left: ${left}px; top: ${top}px;">
-                ${(player === 'X' &&
-                  `<path class="path" d="M16,16L112,112"></path><path class="path" d="M112,16L16,112"></path>`) ||
-                  ''}
-                ${(player === 'O' &&
-                  `<path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>`) ||
-                  ''}
-              </svg>`,
-            )
-            .join('')}
-        </div>
-        <div class="win-player" style="opacity: 0;">
-          ${symbolBig}
-          <div class="label" style="opacity: 0;">${player === 'XO' ? 'DRAW!' : 'WINNER!'}</div>
-        </div>
-      </div>
-      `;
-
-    this.$win.innerHTML = win;
+    this.winnerScreenRenderer.render(player, coords);
   }
 
   async showWinner({ player = 'XO', path = [], direction = '' }) {
@@ -628,6 +590,4 @@ class App {
   }
 }
 
-window.onload = () => {
-  window.app = new App();
-};
+window.app = new App();
