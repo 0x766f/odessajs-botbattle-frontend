@@ -176,25 +176,25 @@ const config = {
   useApi: 'ApiDev',
   videos: {
     X: [
-      '../assets/google-wins/1.mp4',
-      '../assets/google-wins/2.mp4',
-      '../assets/google-wins/3.mp4',
-      '../assets/google-wins/4.mp4',
-      '../assets/google-wins/5.mp4',
+      { src: '../assets/google-wins/1.mp4', hasTitle: true },
+      { src: '../assets/google-wins/2.mp4' },
+      { src: '../assets/google-wins/3.mp4' },
+      { src: '../assets/google-wins/4.mp4' },
+      { src: '../assets/google-wins/5.mp4' },
     ],
     O: [
-      '../assets/alexa-wins/1.mp4',
-      '../assets/alexa-wins/2.mp4',
-      '../assets/alexa-wins/3.mp4',
-      '../assets/alexa-wins/4.mp4',
-      '../assets/alexa-wins/5.mp4',
-      '../assets/alexa-wins/6.mp4',
+      { src: '../assets/alexa-wins/1.mp4', hasTitle: true },
+      { src: '../assets/alexa-wins/2.mp4' },
+      { src: '../assets/alexa-wins/3.mp4' },
+      { src: '../assets/alexa-wins/4.mp4' },
+      { src: '../assets/alexa-wins/5.mp4' },
+      { src: '../assets/alexa-wins/6.mp4' },
     ],
     XO: [
-      '../assets/draw/1.mp4',
-      '../assets/draw/2.mp4',
-      '../assets/draw/3.mp4',
-      '../assets/draw/4.mp4',
+      { src: '../assets/draw/1.mp4' },
+      { src: '../assets/draw/2.mp4' },
+      { src: '../assets/draw/3.mp4' },
+      { src: '../assets/draw/4.mp4' },
     ],
   },
 };
@@ -262,14 +262,14 @@ class WinnerScreenRenderer {
   }
 
   renderWinner(winner) {
-    const videoUrl = this.getRandomVideo(winner);
+    const video = this.getRandomVideo(winner);
     switch (winner) {
       case 'X':
-        return this.renderVideo('GOOGLE HOME WINNER!', videoUrl);
+        return this.renderVideo(video, 'GOOGLE HOME WINS!');
       case 'O':
-        return this.renderVideo('ALEXA WINNER!', videoUrl);
+        return this.renderVideo(video, 'ALEXA WINS!');
       default:
-        return this.renderVideo('DRAW!', videoUrl);
+        return this.renderVideo(video, 'DRAW!');
     }
   }
 
@@ -279,11 +279,12 @@ class WinnerScreenRenderer {
     return videos[randomArrayIndex];
   }
 
-  renderVideo(title, videoUrl) {
+  renderVideo(video, defaultTitle) {
+    const title = video.hasTitle ? '' : defaultTitle;
     return `
       <div class="congrats-container">
-        <video autoplay loop muted src="${videoUrl}" class="full-width"></video>      
-        <div class="label congrats-container__label" style="opacity: 0;">${title}</div>
+        <video autoplay loop muted src="${video.src}" class="full-width"></video>      
+        <div class="label congrats-container__label meme-text" style="opacity: 0;">${title}</div>
       </div>
     `;
   }
