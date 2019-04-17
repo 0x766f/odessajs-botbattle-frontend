@@ -159,7 +159,7 @@ const config = {
     width: 20,
     delayBeforeShow: 500,
     durationDraw: 100,
-    delayBeforeCollapse: 1000,
+    delayBeforeCollapse: 500,
     durationCollapse: 250,
   },
   delayBeforeUpdateScores: 500,
@@ -282,7 +282,7 @@ class WinnerScreen {
   renderVideo(video, defaultTitle) {
     const title = video.hasTitle ? '' : defaultTitle;
     return `
-      <div class="congrats-container">
+      <div class="congrats-container" style="opacity: 0" data-congrats-container>
         <video autoplay loop muted src="${video.src}" class="full-width"></video>      
         <div class="label congrats-container__label meme-text" style="opacity: 0;">${title}</div>
       </div>
@@ -574,6 +574,8 @@ class App {
       }
 
       await delay(config.crossOut.delayBeforeCollapse);
+
+      $('[data-congrats-container]').style.opacity = 1;
 
       $winSymbols.style.opacity = 0;
     }
