@@ -224,7 +224,7 @@ svg .path {
 }
 
 .congrats-container__label {
-  font-size: 70px;
+  font-size: 4vw;
   position: absolute;
   bottom: 10%;
   left: 0;
