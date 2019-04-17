@@ -226,7 +226,7 @@ class StoreScores {
   }
 }
 
-class WinnerScreenRenderer {
+class WinnerScreen {
   constructor(element) {
     this.element = element;
   }
@@ -306,7 +306,7 @@ class App {
       scores: new StoreScores(),
     };
 
-    this.winnerScreen = new WinnerScreenRenderer(this.$win);
+    this.winnerScreen = new WinnerScreen(this.$win);
     this.api = new config.apisClasses[config.useApi](config.pubNubKeys);
 
     $('#alexa').ondblclick = () => {
@@ -646,4 +646,4 @@ class App {
 
 window.onload = () => {
   window.app = new App();
-}
+};
