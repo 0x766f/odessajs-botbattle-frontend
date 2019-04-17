@@ -640,7 +640,7 @@ class App {
   async finish() {
     this.state.finish = true;
     await this.showWinner(this.state.winner);
-    // this.newGame();
+    this.newGame();
   }
 }
 
