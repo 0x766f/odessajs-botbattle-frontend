@@ -173,7 +173,7 @@ const config = {
     DevPubNubApi,
     PubNubApi,
   },
-  useApi: 'ApiDev',
+  useApi: 'PubNubApi',
   videos: {
     X: [
       { src: '../assets/google-wins/1.mp4', hasTitle: true },
