@@ -163,7 +163,7 @@ const config = {
     durationCollapse: 250,
   },
   delayBeforeUpdateScores: 500,
-  delayBeforeResetGame: 4000,
+  delayBeforeResetGame: 7000,
   pubNubKeys: {
     publishKey: '',
     subscribeKey: '',
@@ -575,10 +575,10 @@ class App {
 
       await delay(config.crossOut.delayBeforeCollapse);
 
-      $('[data-congrats-container]').style.opacity = 1;
-
       $winSymbols.style.opacity = 0;
     }
+
+    $('[data-congrats-container]').style.opacity = 1;
 
     $winPlayer.style.opacity = 1;
 
