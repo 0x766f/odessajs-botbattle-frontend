@@ -163,7 +163,7 @@ const config = {
     durationCollapse: 250,
   },
   delayBeforeUpdateScores: 500,
-  delayBeforeResetGame: 4000,
+  delayBeforeResetGame: 7000,
   pubNubKeys: {
     publishKey: '',
     subscribeKey: '',
@@ -174,6 +174,29 @@ const config = {
     PubNubApi,
   },
   useApi: 'PubNubApi',
+  videos: {
+    X: [
+      { src: '../assets/google-wins/1.mp4', hasTitle: true },
+      { src: '../assets/google-wins/2.mp4' },
+      { src: '../assets/google-wins/3.mp4' },
+      { src: '../assets/google-wins/4.mp4' },
+      { src: '../assets/google-wins/5.mp4' },
+    ],
+    O: [
+      { src: '../assets/alexa-wins/1.mp4', hasTitle: true },
+      { src: '../assets/alexa-wins/2.mp4' },
+      { src: '../assets/alexa-wins/3.mp4', hasTitle: true },
+      { src: '../assets/alexa-wins/4.mp4' },
+      { src: '../assets/alexa-wins/5.mp4' },
+      { src: '../assets/alexa-wins/6.mp4' },
+    ],
+    XO: [
+      { src: '../assets/draw/1.mp4' },
+      { src: '../assets/draw/2.mp4' },
+      { src: '../assets/draw/3.mp4' },
+      { src: '../assets/draw/4.mp4' },
+    ],
+  },
 };
 
 class StoreScores {
@@ -203,6 +226,70 @@ class StoreScores {
   }
 }
 
+class WinnerScreen {
+  constructor(element) {
+    this.element = element;
+  }
+
+  render(winner, coords) {
+    this.element.innerHTML = `
+      <div id="winner-screen" class="center anim-hide" role="button" style="color: rgb(84, 84, 84); opacity: 0; line-height: 230px; visibility: inherit;">
+        <div class="win-symbols  ${winner}" style="opacity: 0;">
+          ${this.renderWinnerSymbols(winner, coords)}
+        </div>
+        <div class="win-player full-width" style="opacity: 0;">${this.renderWinner(winner)}</div>
+      </div>
+      `;
+  }
+
+  renderWinnerSymbols(winner, coords) {
+    const xWinnerSymbol = '<path class="path" d="M16,16L112,112"></path><path class="path" d="M112,16L16,112"></path>';
+    const oWinnerSymbol = '<path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>';
+
+    const symbols = coords
+      .map(({ left, top }) => `
+         <svg class="${winner} win-symbol" viewBox="0 0 128 128" style="left: ${left}px; top: ${top}px;">
+           ${(winner === 'X' && xWinnerSymbol) || ''}
+           ${(winner === 'O' && oWinnerSymbol) || ''}
+         </svg>`)
+      .join('');
+
+    return `
+    <svg class="symbol">
+      <line class="cross-out player-${winner} path" />
+    </svg>
+    ${symbols}`;
+  }
+
+  renderWinner(winner) {
+    const video = this.getRandomVideo(winner);
+    switch (winner) {
+      case 'X':
+        return this.renderVideo(video, 'GOOGLE HOME WINS!');
+      case 'O':
+        return this.renderVideo(video, 'ALEXA WINS!');
+      default:
+        return this.renderVideo(video, 'DRAW!');
+    }
+  }
+
+  getRandomVideo(winner) {
+    const videos = config.videos[winner];
+    const randomArrayIndex = Math.floor(Math.random() * videos.length);
+    return videos[randomArrayIndex];
+  }
+
+  renderVideo(video, defaultTitle) {
+    const title = video.hasTitle ? '' : defaultTitle;
+    return `
+      <div class="congrats-container" style="opacity: 0" data-congrats-container>
+        <video autoplay loop muted src="${video.src}" class="full-width"></video>      
+        <div class="label congrats-container__label meme-text" style="opacity: 0;">${title}</div>
+      </div>
+    `;
+  }
+}
+
 class App {
   constructor() {
     this.$board = $('#board');
@@ -219,6 +306,7 @@ class App {
       scores: new StoreScores(),
     };
 
+    this.winnerScreen = new WinnerScreen(this.$win);
     this.api = new config.apisClasses[config.useApi](config.pubNubKeys);
 
     $('#alexa').ondblclick = () => {
@@ -390,46 +478,7 @@ class App {
       return { left, top };
     });
 
-    const symbolsBig = {
-      X: `<svg class="X" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M16,16L112,112"></path>
-            <path class="path" d="M112,16L16,112"></path>
-          </svg>`,
-      O: `<svg class="O" aria-label="O" role="img" viewBox="0 0 128 128" style="width: 10rem; height: 10rem;">
-            <path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>
-          </svg>`,
-    };
-
-    const symbolBig = player === 'XO' ? `${symbolsBig.X}${symbolsBig.O}` : symbolsBig[player];
-
-    const win = `
-      <div id="winner-screen" class="center anim-hide" role="button" style="color: rgb(84, 84, 84); opacity: 0; z-index: 4; line-height: 230px; visibility: inherit; position: fixed;">
-        <div class="win-symbols  ${player}" style="opacity: 0;">
-          <svg class="symbol">
-            <line class="cross-out player-${player} path" />
-          </svg>
-          ${coords
-            .map(
-              ({ left, top }) => `
-              <svg class="${player} win-symbol" viewBox="0 0 128 128" style="left: ${left}px; top: ${top}px;">
-                ${(player === 'X' &&
-                  `<path class="path" d="M16,16L112,112"></path><path class="path" d="M112,16L16,112"></path>`) ||
-                  ''}
-                ${(player === 'O' &&
-                  `<path class="path" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16"></path>`) ||
-                  ''}
-              </svg>`,
-            )
-            .join('')}
-        </div>
-        <div class="win-player" style="opacity: 0;">
-          ${symbolBig}
-          <div class="label" style="opacity: 0;">${player === 'XO' ? 'DRAW!' : 'WINNER!'}</div>
-        </div>
-      </div>
-      `;
-
-    this.$win.innerHTML = win;
+    this.winnerScreen.render(player, coords);
   }
 
   async showWinner({ player = 'XO', path = [], direction = '' }) {
@@ -439,7 +488,6 @@ class App {
 
     const $win = $(`#winner-screen`);
     const $winPlayer = $('.win-player', this.$win);
-    const $winPlayerSvg = $$('.win-player svg', this.$win);
     const $winLabel = $('.label', this.$win);
 
     $win.style.opacity = 1;
@@ -454,8 +502,6 @@ class App {
       const firstAnimRect = $firstAnimSymbol.getBoundingClientRect();
       const lastAnimRect = $lastAnimSymbol.getBoundingClientRect();
       const animSymbolHalfWidth = firstAnimRect.width / 2;
-      const { left, top } = $winPlayerSvg[0].getBoundingClientRect();
-      const moveTo = { left, top };
 
       let crossOutCoords = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
@@ -505,14 +551,15 @@ class App {
 
       $winSymbols.style.opacity = 1;
 
-      $crossOut.setAttribute('x1', crossOutCoords.x1);
+      const winnerScreenOffsetLeft = $win.getBoundingClientRect().left;
+      $crossOut.setAttribute('x1', crossOutCoords.x1 - winnerScreenOffsetLeft);
       $crossOut.setAttribute('y1', crossOutCoords.y1);
-      $crossOut.setAttribute('x2', crossOutCoords.x1);
+      $crossOut.setAttribute('x2', crossOutCoords.x1 - winnerScreenOffsetLeft);
       $crossOut.setAttribute('y2', crossOutCoords.y1);
 
       $crossOut.velocity(
         {
-          x2: crossOutCoords.x2,
+          x2: crossOutCoords.x2 - winnerScreenOffsetLeft,
           y2: crossOutCoords.y2,
         },
         {
@@ -528,43 +575,14 @@ class App {
 
       await delay(config.crossOut.delayBeforeCollapse);
 
-      await Promise.all([
-        $animSymbols.map(
-          el =>
-            new Promise(resolve => {
-              el.velocity(moveTo, {
-                duration: config.crossOut.durationCollapse,
-              }).then(() => resolve());
-            }),
-        ),
-        new Promise(resolve => {
-          $crossOut
-            .velocity(
-              {
-                x1: moveTo.left + animSymbolHalfWidth,
-                y1: moveTo.top + animSymbolHalfWidth,
-                x2: moveTo.left + animSymbolHalfWidth,
-                y2: moveTo.top + animSymbolHalfWidth,
-              },
-              {
-                duration: config.crossOut.durationCollapse,
-              },
-            )
-            .then(() => resolve());
-        }),
-      ]);
-
       $winSymbols.style.opacity = 0;
     }
+
+    $('[data-congrats-container]').style.opacity = 1;
 
     $winPlayer.style.opacity = 1;
 
     this.hideBoard();
-
-    $winPlayerSvg.forEach($el => {
-      $el.style.width = '26rem';
-      $el.style.height = '26rem';
-    });
 
     $winLabel.style.opacity = 1;
 
