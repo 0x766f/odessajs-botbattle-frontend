@@ -185,7 +185,7 @@ const config = {
     O: [
       { src: '../assets/alexa-wins/1.mp4', hasTitle: true },
       { src: '../assets/alexa-wins/2.mp4' },
-      { src: '../assets/alexa-wins/3.mp4' },
+      { src: '../assets/alexa-wins/3.mp4', hasTitle: true },
       { src: '../assets/alexa-wins/4.mp4' },
       { src: '../assets/alexa-wins/5.mp4' },
       { src: '../assets/alexa-wins/6.mp4' },
